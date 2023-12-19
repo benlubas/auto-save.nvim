@@ -45,15 +45,20 @@ local save_condition = function(buf)
   local disabled_ft = { "oil", "harpoon" }
 
   return vim.api.nvim_buf_get_option(buf, "modifiable")
-      and not vim.tbl_contains(disabled_ft, vim.api.nvim_buf_get_option(buf, "filetype"))
-      ---@diagnostic disable-next-line: undefined-field
-      and not vim.regex("oil-ssh://"):match_str(vim.api.nvim_buf_get_name(0))
+    and not vim.tbl_contains(disabled_ft, vim.api.nvim_buf_get_option(buf, "filetype"))
+    ---@diagnostic disable-next-line: undefined-field
+    and not vim.regex("oil-ssh://"):match_str(vim.api.nvim_buf_get_name(0))
 end
 
 function M.save(buf)
   buf = buf or vim.api.nvim_get_current_buf()
 
-  if not save_condition(buf) or not vim.api.nvim_buf_get_option(buf, "modified") or vim.g.auto_save_abort then
+  if
+    not vim.api.nvim_buf_is_valid(buf)
+    or not save_condition(buf)
+    or not vim.api.nvim_buf_get_option(buf, "modified")
+    or vim.g.auto_save_abort
+  then
     return
   end
 
